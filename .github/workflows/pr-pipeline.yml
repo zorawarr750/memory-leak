@@ -1,0 +1,33 @@
+name: Security & Testing Pipeline
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  security-scans:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Linting with Flake8
+        run: |
+          pip install flake8
+          flake8 . || true
+          
+      - name: SAST Scan (Bandit)
+        run: |
+          pip install bandit
+          bandit -r . --skip B104 || true
+          
+      - name: Build Docker Image for scanning
+        run: docker build -t test-app .
+        
+      - name: Container Vulnerability Scan (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'test-app'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
