@@ -17,6 +17,7 @@ spec:
       containers:
       - name: memory-leak-container
         image: test-app:latest 
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
         resources:
