@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-leak-app
+  labels:
+    app: python-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-microservice
+  template:
+    metadata:
+      labels:
+        app: python-microservice
+    spec:
+      containers:
+      - name: memory-leak-container
+        image: test-app:latest 
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "150Mi"
+          limits:
+            memory: "500Mi"
